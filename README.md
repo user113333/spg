@@ -79,32 +79,6 @@ In the transformation step for each content file (and dir) **one content file** 
 │for each yaml LIST ELEMENT├──►MATCH│layout/magic/list/LIST/ELEMENT.html│
 └──────────────────────────┘        └───────────────────────────────────┘
 ```
-```mermaid
-flowchart LR
-    subgraph one["File transformations"]
-    A["for each ELEMENT inside content/"]
-    B{"Search for absulute path match"}
-    MA["Match: Identical path name wo. file exntension"]
-    MB["Match: layout/magic/file.html"]
-    MC["Match: layout/magic/dir.html"]
-
-    A --> B
-    B -->|"found"| MA
-    B -->|"not found"| I["if"]
-
-    I -->|"ELEMENT is FILE"| MB
-    I -->|"ELEMENT is DIRECTORY"| MC
-    end
-    
-    subgraph two["After all transformations transform yaml lists"]
-    D["for each yaml LIST"]
-    E["for each yaml LIST ELEMENT"]
-    MD["Match: layout/magic/list/LIST.html"]
-    ME["Match: layout/magic/list/LIST/ELEMENT.html"]
-    D --> MD
-    E --> ME
-    end
-```
 #### layout/special/
 here are files with special functions that are used in transformation step if perfect match is not found.
 - page.
