@@ -64,20 +64,20 @@ In the transformation step for each content file (and dir) **one content file** 
 │if ELEMENT is DIR├──────────────────────►MATCH│layout/magic/dir.html│   
 └─────────────────┘                            └─────────────────────┘   
                                                                          
-┌────────────────────────────────────────┐                               
-│After transformation step for yaml list:│                               
-│---                                     │                               
-│listname: [element, element2, element3] │                               
-│---                                     │                               
-└────────────────────────────────────────┘                               
-                                                                         
-┌──────────────────┐                ┌───────────────────────────┐        
-│for each yaml LIST├──────────►MATCH│layout/magic/list/LIST.html│        
-└──────────────────┘                └───────────────────────────┘        
-                                                                         
-┌──────────────────────────┐        ┌───────────────────────────────────┐
-│for each yaml LIST ELEMENT├──►MATCH│layout/magic/list/LIST/ELEMENT.html│
-└──────────────────────────┘        └───────────────────────────────────┘
+┌────────────────────────────────────────┐                                     
+│After transformation step for yaml list:│                                     
+│---                                     │                                     
+│listname: [element, element2, element3] │                                     
+│---                                     │                                     
+└┬───────────────────────────────────────┘                                     
+ │                                                                             
+ │   ┌──────────────────┐                 ┌───────────────────────────┐        
+ ├──►│for each yaml LIST├───────────►MATCH│layout/magic/list/LIST.html│        
+ │   └──────────────────┘                 └───────────────────────────┘        
+ │                                                                             
+ │   ┌──────────────────────────┐         ┌───────────────────────────────────┐
+ └──►│for each yaml LIST ELEMENT├───►MATCH│layout/magic/list/LIST/ELEMENT.html│
+     └──────────────────────────┘         └───────────────────────────────────┘
 ```
 #### layout/special/
 here are files with special functions that are used in transformation step if perfect match is not found.
