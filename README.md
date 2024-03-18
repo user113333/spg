@@ -1,7 +1,13 @@
 # spg (Static Page Generator)
+Hugo alternative but much more minimal and simpler to understand. The goal is to create a command line utility that amplifies the html language just a little bit more with `html/template.go` and besides gives you the ability to get content from `markdown` files.
+
+No:
+- Templates
+- Org-mode support
+- Config files
+- ...
 
 ## Directory structure
-
 - content/
 - layout/
 - public/
