@@ -10,91 +10,63 @@ No:
 ## Directory structure
 - content/
 - layout/
-- public/
 - static/
 
-### public/
-Generated static pages are put here.
-
 ### static/
-Directory for files that always get copied into public directory. For html files some `Layout functions` can be used.
+Directory for files that always get copied into output directory. Transformation is applied to them (it matches **nothing** with **this file**), so you get access to Go Template functions.
 
 ### content/
-Directory for data in transform step `data+layout=pages`. Here go directories and `.md` files.
-#### .md file
+Directory consisting of content files for layout. A content file must end in `.md` and be written in **MarkDown**. The top of a MarkDown file may be used for content data section written in **YAML**. Section starts and ends with three dashes: `---`.
+
 Md file example:
 ```md
 ---
-title: Cordon bleu
+title: Carbonara
 time: 60min
+tags: ["breakfast", "launch", "dinner"]
 ---
 
 ## Step 1
 You need to buy required ingredients first: ..
 ```
 
-Md file consists of head in yaml format surrounded with `---` and Markdown content for a page.
-
 ### layout/
-Directory for layout in transform step `data+layout=pages`. Here go directories and `.html` files.
+Directory consisting of layout files for describing a content transformation.
 #### Intro
-In the transformation step for each content file (and dir) **one content file** is matched with **one layout file** (in the dir case **nothing** is matched with **one layout file**). If the layout match is not found a page for content is not generated. The layout matching algorithm follows the procedure:
-```
-+--------------+                                                               
-|Transform step|                                                               
-++-------------+                                                               
- |                                                                             
- |   +--------------------------------+                                        
- +--->for each ELEMENT inside content/|                                        
-     ++-------------------------------+                                        
-      |                                                                        
-     +v----------------------------------------------------------------------+ 
-     |                     Search for perfect path match                     | 
-     |    ex. for files (content/recepie/cb.md and layout/recepie/cb.html)   | 
-     |     ex. for directories (content/recepie/ and layout/recepie.html)    | 
-     |(file extension does not count since .md and .html are expected anyway)| 
-     ++--------------------------+-------------------------------------------+ 
-      |                          |                                             
-      v                          v                                             
-      If not found               If found                                      
-      |                          |                                             
-      |                          |                  +-------------------+      
-      |                          +------------>MATCH|Identical path name|      
-      |                                             |wo. file extension |      
-      |                                             +-------------------+      
-      |                                                                        
-     +v-----------------+                           +----------------------+   
-     |if ELEMENT is FILE+--------------------->MATCH|layout/magic/file.html|   
-     ++-----------------+                           +----------------------+   
-      |                                                                        
-      v                                                                        
-      else                                                                     
-      |                                                                        
-     +v----------------+                            +---------------------+    
-     |if ELEMENT is DIR+---------------------->MATCH|layout/magic/dir.html|    
-     +-----------------+                            +---------------------+    
-                                                                               
-+----------------------------------------+                                     
-|After Transform step for yaml lists:    |                                     
-|---                                     |                                     
-|listname: [element, element2, element3] |                                     
-|---                                     |                                     
-++---------------------------------------+                                     
- |                                                                             
- |   +------------------+                 +---------------------------+        
- +--->for each yaml LIST+----------->MATCH|layout/magic/list/LIST.html|        
- |   +------------------+                 +---------------------------+        
- |                                                                             
- |   +--------------------------+         +-----------------------------------+
- +--->for each yaml LIST ELEMENT+--->MATCH|layout/magic/list/LIST/ELEMENT.html|
-     +--------------------------+         +-----------------------------------+
-```
+In the transformation step for each content file it tries to match **one content file** with **one layout file** and for each directory name it tries to match **one directory** with **one layout file**. If the match happens content gets transformed and you get some output file but if no match is found it tries to match with **magic** files inside `layout/magic/` directory and if it is unable to find a match is simply doesn't output anything - It just skips the file.
+
+The layout matching algorithm for content files follows the following procedure:
+1. First search for perfect path match from content, layout forward.
+    - Ex: `content/recipes/carbonara.md` matches `layout/recipes/carbonara.html`
+    - Ex: `content/recipes` matches layout/recipes.html (recipes is directory)
+2. If not found, try to match with `layout/magic/file.html` (if file) or `layout/magic/dir.html` (if is directory)
+3. If not found, skip
+This is for matching files (and directories) from `content/` folder. In each content file a YAML section can have a sequence of items. Similarly for each sequence it tries to match **one sequence** with **one layout file** and **one sequence item** with **one layout file**. Of course there are many content files and each content file can have a same sequence name - The program just joins the "sequence names" together and it tries to match for each unique sequence name. The items for each "sequence name" are presented together for layout file. And vice versa.
+
+The layout matching algorithm for sequences follows the procedure:
+1. First search for perfect path match.
+    - Ex: in sequence `tags: ["i1", "i2"]` it matches with `layout/sequence/tags.html`
+2. If not found, try to match with `layout/magic/sequence.html`
+3. If not found, skip
+
+The layout matching algorithm for sequence items follows the procedure:
+1. First search for perfect path match.
+    - Ex: in sequence `tags: ["i1", "i2"]` it matches with `layout/sequence/tags/i1.html`
+2. If not found, try to match with `layout/sequence/SEQUENCE/item.html`
+2. If not found, try to match with `layout/magic/item.html`
+3. If not found, skip
+
+Note that `content/` can't have a directory with a name `magic` and `sequence`[^1].
+[^1]: If this is a huge deal-breaker it can be changed so for perfect content file path match it looks inside of `layout/content/*` instead of `layout/*`.
 #### layout/magic/
-here are files with magic functions that are used in transformation step if perfect match is not found.
+List of magic files:
 - `layout/magic/file.html`: matches any file
 - `layout/magic/DIR/file.html`: matches any file in `DIR` directory. This has higher precedence than the parent `file.html` matchers.
-- `layout/magic/dir.html`: matches any dir
-- `layout/magic/DIR/dir.html`: matches any dir in `DIR` directory. This has higher precedence than the parent `dir.html` matchers.
-- `layout/magic/list/*`: list matching described in above diagram
+- `layout/magic/dir.html`: matches any directory
+- `layout/magic/DIR/dir.html`: matches any directory in `DIR` directory. This has higher precedence than the parent `dir.html` matchers.
+- `layout/magic/sequence.html` matches any sequence
+- `layout/magic/item.html` matches any sequence item
 #### Layout Language
-#### Layout Functions
+Go template: data-driven templates for generating textual output. **TODO**
+#### Go template Functions
+List of Go template functions: **TODO**
